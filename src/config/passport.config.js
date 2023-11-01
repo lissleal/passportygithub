@@ -62,10 +62,10 @@ const initializePassport = () => {
         callbackURL: "http://localhost:8080/api/users/githubcallback"
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            if (profile.email && profile.email.length > 0) {
-                const email = profile.email[0].value;
-                let user = await userManager.findOne({ email: email });
-                console.log(`User en passport use github: ${user}`);
+            if (profile.emails && profile.emails.length > 0) {
+                const email = profile.emails[0].value;
+                let user = await userManager.findEmail({ email: email });
+                console.log(`User en passport.use /github: ${user}`);
 
                 if (!user) {
                     let newUser = {
@@ -75,7 +75,7 @@ const initializePassport = () => {
                         password: "",
                         role: "admin"
                     }
-                    let result = await userManager.create(newUser);
+                    let result = await userManager.addUser(newUser);
                     return done(null, result);
                 } else {
                     return done(null, user);
