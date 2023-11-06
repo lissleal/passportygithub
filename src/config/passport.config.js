@@ -28,7 +28,11 @@ const initializePassport = () => {
         }))
 
     passport.serializeUser((user, done) => {
+        console.log(`User del serialize antes de done: ${user}`);
+        console.log(`User._id del serialize antes de done: ${user._id}`);
         done(null, user._id);
+        console.log(`User del serialize: ${user}`);
+        console.log(`User._id del serialize: ${user._id}`);
     })
     passport.deserializeUser(async (id, done) => {
         try {
@@ -62,22 +66,33 @@ const initializePassport = () => {
         callbackURL: "http://localhost:8080/api/users/githubcallback"
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            if (profile.emails && profile.emails.length > 0) {
-                const email = profile.emails[0].value;
+            let profileJson = JSON.stringify(profile);
+            const email = profile.emails[0].value;
+            let name = profile.displayName;
+            //console.log(`Profile de github en Json: ${profileJson}`);
+            // console.log(`email de github: ${email}`);
+            if (email && email.length > 0) {
                 let user = await userManager.findEmail({ email: email });
                 console.log(`User en passport.use /github: ${user}`);
 
                 if (!user) {
+                    console.log("estoy creando el user de github");
+
                     let newUser = {
-                        name: profile._json.name,
-                        surname: "",
+                        name: name,
                         email: email,
                         password: "",
                         role: "admin"
                     }
+                    console.log(`newUser en passport.use/github: ${newUser}`);
+                    let newUserJson = JSON.stringify(newUser);
+                    console.log(`newUser en passport.use/github en Json: ${newUserJson}`);
+
                     let result = await userManager.addUser(newUser);
                     return done(null, result);
                 } else {
+                    console.log("estoy retornando el user de github");
+                    console.log(`User en passport.use/github else: ${user}`);
                     return done(null, user);
                 }
 
