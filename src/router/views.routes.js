@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import ProductManager from "../controlers/ProductManager.js";
 import cartModel from "../controlers/CartManager.js";
 import UserManager from "../controlers/UserManager.js";
@@ -68,13 +68,16 @@ ViewsRouter.get("/login", (req, res) => {
 })
 
 ViewsRouter.get("/profile", async (req, res) => {
-    console.log(`el usuario de la session /profile: ${req.session.user}`);
-    console.log(`el email de la session /profile: ${req.session.email}`);
-    if (!req.session.email) {
+    let userJson = JSON.stringify(req.session.user)
+    let user = req.session.user
+    let email = user.email
+    console.log(`el usuario de la session /profile: ${userJson}`);
+    console.log(`el email de la session /profile: ${email}`);
+    if (!email) {
         res.redirect("/login")
         console.log("entre en el if de /profile")
     }
-    const email = req.session.email
+    // const email = req.session.email
     const userData = {
         email: email,
         role: "admin"
